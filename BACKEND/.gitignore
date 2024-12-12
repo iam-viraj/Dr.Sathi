@@ -1,9 +1,10 @@
 
 *.log
+*.env
+
 
 node_modules/
 
-.env
 
 build/
 
