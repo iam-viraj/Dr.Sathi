@@ -2,6 +2,7 @@ import { compareSync } from "bcrypt";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
+import {generateToken} from "../utils/jwtToken.js"
 
 // Register Patient
 export const patientRegister = catchAsyncErrors(async (req, res, next) => {
@@ -50,13 +51,7 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     password,
     role,
   });
-
-  // Return success response
-  res.status(200).json({
-    success: true,
-    message: "User Registered Successfully!",
-    
-  });
+  generateToken(user,"User Registered !",200,res)
 });
 
 
@@ -92,10 +87,7 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   if (user.role !== role) {
     return next(new ErrorHandler("Invalid Role!", 401));
   }
+  generateToken(user,"User Logged in Successfully",200,res)
 
-  // If successful
-  res.status(200).json({
-    success: true,
-    message: "User Logged in Successfully!",
-  });
+  
 });

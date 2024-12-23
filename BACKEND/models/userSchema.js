@@ -77,9 +77,22 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 
 // Generate JWT Token
 userSchema.methods.generateJsonWebToken = function () {
+  // Ensure JWT_EXPRIES is a valid string or fallback to '7d'
+  const expiresIn = process.env.JWT_EXPRIES ? process.env.JWT_EXPRIES.trim() : '7d';
+  
+  // console.log("JWT_EXPRIES value being used:", expiresIn);  // Log for debugging
+  // console.log("Expires In:", expiresIn);  // Log the value being used
+
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES,
+    expiresIn: expiresIn,  // Pass the valid expiresIn value
   });
 };
+
+
+
+
+
+
+
 
 export const User = mongoose.model("User", userSchema);
