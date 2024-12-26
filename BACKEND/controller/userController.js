@@ -2,20 +2,20 @@ import { compareSync } from "bcrypt";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
-import {generateToken} from "../utils/jwtToken.js"
+import { generateToken } from "../utils/jwtToken.js"
 
 // Register Patient
 export const patientRegister = catchAsyncErrors(async (req, res, next) => {
-  const { 
-    firstName, 
-    lastName, 
-    email, 
-    phone, 
-    anotherPhone, 
-    dob, 
-    gender, 
-    password, 
-    role 
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    anotherPhone,
+    dob,
+    gender,
+    password,
+    role
   } = req.body;
 
   // Validation: Ensure all fields are provided
@@ -51,7 +51,7 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     password,
     role,
   });
-  generateToken(user,"User Registered !",200,res)
+  generateToken(user, "User Registered !", 200, res)
 });
 
 
@@ -87,21 +87,21 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   if (user.role !== role) {
     return next(new ErrorHandler("Invalid Role!", 401));
   }
-  generateToken(user,"User Logged in Successfully",200,res)
+  generateToken(user, "User Logged in Successfully", 200, res)
 
-  
+
 });
 
 
 export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
-  const { 
-    firstName, 
-    lastName, 
-    email, 
-    phone, 
-    anotherPhone, 
-    dob, 
-    gender, 
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    anotherPhone,
+    dob,
+    gender,
     password,
   } = req.body;
   if (
@@ -120,7 +120,8 @@ export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
   if (isRegistered) {
     return next(new ErrorHandler(`${isRegistered.role} with this Email Already Registered!`, 400))
   }
-  const admin = await User.create({ firstName,
+  const admin = await User.create({
+    firstName,
     lastName,
     email,
     phone,
@@ -128,18 +129,50 @@ export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
     dob,
     gender,
     password,
-    role:"Admin"
-   });
-   res.status(201).json({ success: true, message:"New Admin Registered!" });
+    role: "Admin"
+  });
+  res.status(201).json({ success: true, message: "New Admin Registered!" });
 });
 
 export const getAllDoctors = catchAsyncErrors(async (req, res, next) => {
-  const doctors = await User.find({role:"Doctor"});
+  const doctors = await User.find({ role: "Doctor" });
   res.status(200).json({ success: true, doctors });
 });
 
-export const getUserDetails =catchAsyncErrors(async(req, res,next) =>{
+export const getUserDetails = catchAsyncErrors(async (req, res, next) => {
   const user = req.user;
   res.status(200).json({ success: true, user });
 
+});
+
+export const logoutAdmin = catchAsyncErrors(async (req, res, next) => {
+  res.status(200).cookie("adminToken", "", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  }).json({
+    success: true,
+    message: "User Logged Out Successfully!",
+  });
+});
+
+
+export const logoutPatient = catchAsyncErrors(async (req, res, next) => {
+  res.status(200).cookie("patientToken", "", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  }).json({
+    success: true,
+    message: "Patient Logged Out Successfully!",
+  });
+});
+
+
+export const logoutDoctor = catchAsyncErrors(async (req, res, next) => {
+  res.status(200).cookie("doctorToken", "", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  }).json({
+    success: true,
+    message: "Doctor Logged Out Successfully!",
+  });
 });
